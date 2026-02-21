@@ -139,6 +139,16 @@ cd server && npm install
 cd ../client && npm install
 ```
 
+If npm itself crashes with `stdin` errors during **run** commands, start processes directly with Node:
+
+```bash
+# backend
+cd server && node server.js
+
+# frontend (new terminal)
+cd client && node node_modules/vite/bin/vite.js
+```
+
 ---
 
 ## Run locally
@@ -159,6 +169,13 @@ node server.js
 ### Terminal 2
 ```bash
 npm run dev:client
+```
+
+If npm throws a Windows stdin error while starting Vite, run client directly without npm:
+
+```bash
+cd client
+node node_modules/vite/bin/vite.js
 ```
 
 Open: `http://localhost:5173`
