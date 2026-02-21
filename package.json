@@ -6,6 +6,9 @@
     "install:server": "npm install --prefix ./server",
     "install:client": "npm install --prefix ./client",
     "install:all": "npm run install:server && npm run install:client",
+    "dev:server": "cd server && node server.js",
+    "dev:client": "cd client && node node_modules/vite/bin/vite.js",
+    "build:client": "cd client && node node_modules/vite/bin/vite.js build"
     "dev:server": "npm run dev --prefix ./server",
     "dev:client": "npm run dev --prefix ./client",
     "build:client": "npm run build --prefix ./client"

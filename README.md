@@ -160,6 +160,7 @@ cd client && node node_modules/vite/bin/vite.js
 npm run dev:server
 ```
 
+(Under the hood this now runs `cd server && node server.js` directly to avoid nested npm/prefix issues on Windows.)
 If npm still throws a Windows stdin error while running scripts, start backend directly:
 
 ```bash
@@ -172,6 +173,13 @@ node server.js
 npm run dev:client
 ```
 
+(Under the hood this now runs `cd client && node node_modules/vite/bin/vite.js` directly.)
+
+If npm itself still crashes in your shell, run these directly:
+
+```bash
+cd server && node server.js
+cd client && node node_modules/vite/bin/vite.js
 If npm throws a Windows stdin error while starting Vite, run client directly without npm:
 
 ```bash
@@ -182,6 +190,26 @@ node node_modules/vite/bin/vite.js
 Open: `http://localhost:5173`
 
 ---
+
+### If server/package.json has duplicate `dev` scripts
+
+If you see two `"dev"` entries in `server/package.json`, npm may behave unpredictably. Keep only one:
+
+```json
+"scripts": {
+  "dev": "node --watch server.js",
+  "start": "node server.js",
+  "lint": "echo 'No lint configured'"
+}
+```
+
+Quick fix from repo root:
+
+```bash
+git checkout -- server/package.json
+npm install --prefix ./server
+npm run dev:server
+```
 
 ## API Endpoints
 
