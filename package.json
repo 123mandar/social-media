@@ -1,0 +1,13 @@
+{
+  "name": "property-deal-tracker",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "install:server": "npm install --prefix ./server",
+    "install:client": "npm install --prefix ./client",
+    "install:all": "npm run install:server && npm run install:client",
+    "dev:server": "npm run dev --prefix ./server",
+    "dev:client": "npm run dev --prefix ./client",
+    "build:client": "npm run build --prefix ./client"
+  }
+}
