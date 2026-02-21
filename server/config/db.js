@@ -31,6 +31,12 @@ const connectDB = async () => {
     console.error(
       'ℹ️ Ensure MongoDB is running and set a valid MONGO_URI in server/.env (copy from server/.env.example).'
     );
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ MongoDB connected');
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error.message);
     process.exit(1);
   }
 };

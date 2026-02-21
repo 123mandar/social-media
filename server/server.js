@@ -20,6 +20,9 @@ if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET = 'dev-only-jwt-secret';
 }
 
+dotenv.config();
+connectDB();
+
 const app = express();
 
 app.use(
