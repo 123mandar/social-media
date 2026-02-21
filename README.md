@@ -161,6 +161,12 @@ npm run dev:server
 ```
 
 (Under the hood this now runs `cd server && node server.js` directly to avoid nested npm/prefix issues on Windows.)
+If npm still throws a Windows stdin error while running scripts, start backend directly:
+
+```bash
+cd server
+node server.js
+```
 
 ### Terminal 2
 ```bash
@@ -174,6 +180,11 @@ If npm itself still crashes in your shell, run these directly:
 ```bash
 cd server && node server.js
 cd client && node node_modules/vite/bin/vite.js
+If npm throws a Windows stdin error while starting Vite, run client directly without npm:
+
+```bash
+cd client
+node node_modules/vite/bin/vite.js
 ```
 
 Open: `http://localhost:5173`
