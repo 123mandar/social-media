@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import AnalyticsCharts from '../components/AnalyticsCharts';
@@ -20,6 +21,7 @@ const DashboardPage = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+  const excelInputRef = useRef(null);
 
   const fetchProperties = async () => {
     try {
@@ -98,6 +100,38 @@ const DashboardPage = () => {
     }
   };
 
+
+  const handleExcelImport = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { data } = await api.post('/properties/import/excel', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success(`Imported ${data.insertedCount} properties from Excel`);
+      if (data.errors?.length) {
+        toast((t) => (
+          <div className="max-w-sm text-sm">
+            <p className="font-semibold">Imported with warnings</p>
+            <p>{data.errors[0]}</p>
+            <button className="mt-2 rounded bg-slate-800 px-2 py-1 text-white" onClick={() => toast.dismiss(t.id)}>
+              Close
+            </button>
+          </div>
+        ));
+      }
+      fetchProperties();
+    } catch (error) {
+      const message = error.response?.data?.message || 'Excel import failed';
+      toast.error(message);
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   const content = useMemo(() => {
     if (loading) return <p className="rounded-xl bg-white p-4 dark:bg-slate-800">Loading properties...</p>;
 
@@ -130,6 +164,19 @@ const DashboardPage = () => {
           <button onClick={handleExportCsv} className="rounded-lg border border-slate-300 px-4 py-2 dark:border-slate-600">
             Export CSV
           </button>
+          <button
+            onClick={() => excelInputRef.current?.click()}
+            className="rounded-lg border border-slate-300 px-4 py-2 dark:border-slate-600"
+          >
+            Import Excel
+          </button>
+          <input
+            ref={excelInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleExcelImport}
+            className="hidden"
+          />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}

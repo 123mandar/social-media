@@ -1,5 +1,6 @@
 import Property, { PROPERTY_STATUSES } from '../models/Property.js';
 import { stringify } from 'csv-stringify/sync';
+import xlsx from 'xlsx';
 
 const parseSort = (sortBy, order) => {
   const allowedSortFields = ['price', 'roi', 'createdAt', 'updatedAt'];
@@ -110,6 +111,89 @@ const exportPropertiesCsv = async (req, res) => {
   return res.send(csv);
 };
 
+const parseNumber = (value) => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const normalized = value.replace(/,/g, '').trim();
+    if (!normalized) return NaN;
+    return Number(normalized);
+  }
+  return NaN;
+};
+
+const importPropertiesFromExcel = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Please upload an Excel file (.xlsx or .xls)' });
+  }
+
+  const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
+  const firstSheet = workbook.SheetNames[0];
+
+  if (!firstSheet) {
+    return res.status(400).json({ message: 'Excel file does not contain any sheet' });
+  }
+
+  const rows = xlsx.utils.sheet_to_json(workbook.Sheets[firstSheet], { defval: '' });
+
+  if (!rows.length) {
+    return res.status(400).json({ message: 'Excel file is empty' });
+  }
+
+  const errors = [];
+  const validDocs = [];
+
+  rows.forEach((row, index) => {
+    const rowNumber = index + 2;
+
+    const title = String(row.title || '').trim();
+    const location = String(row.location || '').trim();
+    const builder = String(row.builder || '').trim();
+    const propertyType = String(row.propertyType || '').trim();
+    const status = String(row.status || 'Interested').trim();
+    const notes = String(row.notes || '').trim();
+    const price = parseNumber(row.price);
+    const roi = parseNumber(row.roi);
+
+    if (!title || !location || !builder || !propertyType || Number.isNaN(price) || Number.isNaN(roi)) {
+      errors.push(`Row ${rowNumber}: Missing/invalid required fields (title, location, builder, propertyType, price, roi)`);
+      return;
+    }
+
+    if (!PROPERTY_STATUSES.includes(status)) {
+      errors.push(`Row ${rowNumber}: Status must be one of ${PROPERTY_STATUSES.join(', ')}`);
+      return;
+    }
+
+    validDocs.push({
+      userId: req.user._id,
+      title,
+      location,
+      price,
+      builder,
+      roi,
+      propertyType,
+      status,
+      notes,
+    });
+  });
+
+  if (!validDocs.length) {
+    return res.status(400).json({
+      message: 'No valid rows found in Excel file',
+      errors,
+    });
+  }
+
+  await Property.insertMany(validDocs);
+
+  return res.status(201).json({
+    message: 'Excel import completed',
+    insertedCount: validDocs.length,
+    skippedCount: rows.length - validDocs.length,
+    errors,
+  });
+};
+
 export {
   getProperties,
   createProperty,
@@ -117,4 +201,5 @@ export {
   deleteProperty,
   getAnalytics,
   exportPropertiesCsv,
+  importPropertiesFromExcel,
 };

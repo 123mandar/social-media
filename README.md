@@ -42,6 +42,7 @@ A full-stack real-estate **Property Deal Tracker** that helps investors evaluate
 - Toast notifications
 - Dark mode toggle
 - Export properties to CSV
+- Import properties from Excel (.xlsx/.xls)
 
 ---
 
@@ -196,6 +197,25 @@ Open: `http://localhost:5173`
 - `DELETE /api/properties/:id`
 - `GET /api/properties/analytics`
 - `GET /api/properties/export/csv`
+- `POST /api/properties/import/excel` (multipart form-data with key `file`)
+
+---
+
+
+## Excel Import Format
+
+Upload an `.xlsx` / `.xls` file with these column headers (first row):
+
+- `title`
+- `location`
+- `price`
+- `builder`
+- `roi`
+- `propertyType`
+- `status` (Interested, Negotiating, Booked, Rejected, Bought)
+- `notes` (optional)
+
+Invalid rows are skipped and reported in the API response.
 
 ---
 
