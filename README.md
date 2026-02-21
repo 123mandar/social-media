@@ -72,12 +72,29 @@ A full-stack real-estate **Property Deal Tracker** that helps investors evaluate
 ### Server (`server/.env`)
 Copy `server/.env.example`:
 
+```bash
+cp server/.env.example server/.env
+```
+
+Then verify values:
+
 ```env
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/property_deal_tracker
 JWT_SECRET=change-me-in-production
 CLIENT_URL=http://localhost:5173
 ```
+
+If you run `node server.js` from inside `server/`, this `.env` file must exist or Mongo will use local fallback defaults.
+
+If Mongo still prints `uri ... got "undefined"`, your local code is outdated. Update and re-check scripts:
+
+```bash
+git pull
+npm run
+```
+
+Also ensure `server/.env` contains a real URI string (not `MONGO_URI=undefined`).
 
 ### Client (`client/.env`)
 Copy `client/.env.example`:
@@ -95,18 +112,70 @@ VITE_API_URL=http://localhost:5000/api
 npm run install:all
 ```
 
+If your Windows Git Bash/npm setup throws this error:
+
+```
+npm ERR! Cannot read properties of undefined (reading "stdin")
+```
+
+run installs one-by-one instead:
+
+```bash
+npm run install:server
+npm run install:client
+```
+
+If you get `Missing script: "install:server"` or `"install:client"`, your local clone is likely behind.
+
+```bash
+git pull
+npm run
+```
+
+Then retry. If you still prefer not to use npm scripts, run direct installs:
+
+```bash
+cd server && npm install
+cd ../client && npm install
+```
+
+If npm itself crashes with `stdin` errors during **run** commands, start processes directly with Node:
+
+```bash
+# backend
+cd server && node server.js
+
+# frontend (new terminal)
+cd client && node node_modules/vite/bin/vite.js
+```
+
 ---
 
 ## Run locally
+
 
 ### Terminal 1
 ```bash
 npm run dev:server
 ```
 
+If npm still throws a Windows stdin error while running scripts, start backend directly:
+
+```bash
+cd server
+node server.js
+```
+
 ### Terminal 2
 ```bash
 npm run dev:client
+```
+
+If npm throws a Windows stdin error while starting Vite, run client directly without npm:
+
+```bash
+cd client
+node node_modules/vite/bin/vite.js
 ```
 
 Open: `http://localhost:5173`

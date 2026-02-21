@@ -4,6 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "dev": "node --watch server.js",
     "dev": "nodemon server.js",
     "start": "node server.js",
     "lint": "echo 'No lint configured'"
