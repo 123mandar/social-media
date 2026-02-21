@@ -87,6 +87,15 @@ CLIENT_URL=http://localhost:5173
 
 If you run `node server.js` from inside `server/`, this `.env` file must exist or Mongo will use local fallback defaults.
 
+If Mongo still prints `uri ... got "undefined"`, your local code is outdated. Update and re-check scripts:
+
+```bash
+git pull
+npm run
+```
+
+Also ensure `server/.env` contains a real URI string (not `MONGO_URI=undefined`).
+
 ### Client (`client/.env`)
 Copy `client/.env.example`:
 
